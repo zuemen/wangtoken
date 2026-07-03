@@ -75,7 +75,6 @@ function AdminPanel() {
   const rewards = data?.rewards ?? [];
   const entries = data?.entries ?? [];
   const pendings = entries.filter((e) => e.status === "pending");
-  const careAlerts = entries.filter((e) => e.kind === "care" && !e.reviewed_at);
   const redeems = entries.filter((e) => e.kind === "redeem" && e.fulfilled === false);
 
   async function act(id: string, fn: () => Promise<{ ok: boolean; error: string | null }>) {
@@ -98,23 +97,6 @@ function AdminPanel() {
           退出管理模式
         </button>
       </div>
-
-      {/* 關心提醒 */}
-      {careAlerts.map((e) => (
-        <div key={e.id} className="card mt-4 border-2 border-coral/50 p-4">
-          <div className="text-sm font-bold text-coral">
-            ❤️ 她{fmtTime(e.created_at)}回報「{e.label}」了，記得關心她！
-          </div>
-          {e.note && <div className="mt-1 text-sm text-plum/70">「{e.note}」</div>}
-          <button
-            className="pressable mt-2 rounded-lg bg-coral px-3 py-1.5 text-xs font-bold text-white"
-            onClick={() => act(e.id, () => postJSON(`/api/entries/${e.id}/ack`))}
-            disabled={busyId === e.id}
-          >
-            我關心過她了 ✅
-          </button>
-        </div>
-      ))}
 
       {/* 快速加/扣分 */}
       <SectionTitle>快速記帳</SectionTitle>

@@ -23,7 +23,8 @@ export type Entry = {
   id: string;
   created_at: string;
   actor: "gf" | "admin";
-  kind: "bonus" | "deduct" | "redeem" | "proposal" | "care";
+  // DB 的 check constraint 仍允許 'care'（歷史資料相容），前端已無建立入口
+  kind: "bonus" | "deduct" | "redeem" | "proposal";
   label: string;
   points: number;
   status: "approved" | "pending" | "rejected";

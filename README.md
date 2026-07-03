@@ -58,8 +58,8 @@ npm run dev
 | --- | --- |
 | `/` | 總覽：餘額大卡、本週加減分長條圖、帳本（篩選、照片、狀態） |
 | `/rewards` | 兌換所：獎品牆（餘額不足鎖定）、兌換紀錄（待出貨/已完成）、願望清單 |
-| `/gf` | 女友專區：好事快速按鈕（每日上限）、提案、關心事件回報 |
-| `/admin` | 管理後台（PIN）：快速記帳、審核、CRUD、出貨、關心提醒、CSV 匯出、重置 |
+| `/gf` | 女友專區：好事快速按鈕（每日上限）、提案 |
+| `/admin` | 管理後台（PIN）：快速記帳、審核、CRUD、出貨、CSV 匯出、重置 |
 
 ## 設計要點
 
@@ -67,6 +67,5 @@ npm run dev
 - **兌換防競態**：Postgres function `redeem_reward` 內用 `pg_advisory_xact_lock` 序列化，餘額不足 raise exception，並發也不會超扣。
 - **每日上限**：server 端以台北時區當日計數檢查。
 - **Streak**：近 7 天每天都有「乖乖聽話一天」核准紀錄且本週未領過 → 自動 +1.0「連續7天乖乖聽話🔥」+ 慶祝動畫。
-- **關心事件**：「意外受傷」「傷害自己」是 0 分的 `kind='care'` 紀錄，不扣分；管理後台顯示關心提醒；30 天內 2 次以上「傷害自己」會溫和顯示關懷文字與安心專線 1925。
 - **照片**：client 壓縮 ≤1MB → 上傳私有 bucket → 讀取時 server 簽發 1 小時 signed URL。
 - **安全**：RLS 全開、anon 只有 select（供 Realtime）；寫入一律走 server 端 service role；閘門與管理者皆為 httpOnly HMAC 簽章 cookie（90 天 / 24 小時）。

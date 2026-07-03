@@ -23,13 +23,6 @@ export default function GfPage() {
   const [propPhoto, setPropPhoto] = useState<string | null>(null);
   const [propBusy, setPropBusy] = useState(false);
 
-  // 關心事件
-  const [careType, setCareType] = useState<"意外受傷" | "傷害自己" | null>(null);
-  const [careNote, setCareNote] = useState("");
-  const [carePhoto, setCarePhoto] = useState<string | null>(null);
-  const [careBusy, setCareBusy] = useState(false);
-  const [showSupport, setShowSupport] = useState(false);
-
   const bonusPresets = (data?.presets ?? []).filter((p) => p.active && p.type === "bonus");
   const todayCounts = data?.todayCounts ?? {};
   const myProposals = (data?.entries ?? []).filter((e) => e.kind === "proposal");
@@ -74,26 +67,6 @@ export default function GfPage() {
     if (r.ok) {
       setPropName(""); setPropPoints(""); setPropPhoto(null);
       toast("提案送出，等他審核 💌");
-      refetch();
-    } else toast(r.error!);
-  }
-
-  async function submitCare() {
-    if (!careType || careBusy) return;
-    setCareBusy(true);
-    const r = await postJSON("/api/entries", {
-      kind: "care",
-      label: careType,
-      note: careNote || null,
-      photoPath: carePhoto,
-    });
-    setCareBusy(false);
-    if (r.ok) {
-      toast("他會看到的，好好照顧自己 ❤️");
-      if ((r.json as { showSupport?: boolean }).showSupport) setShowSupport(true);
-      setCareType(null);
-      setCareNote("");
-      setCarePhoto(null);
       refetch();
     } else toast(r.error!);
   }
@@ -178,71 +151,6 @@ export default function GfPage() {
           </div>
         ))}
       </div>
-
-      {/* 關心事件 */}
-      <SectionTitle>我今天受傷了 / 狀態不好 🩹</SectionTitle>
-      <div className="card p-4">
-        <p className="text-xs leading-relaxed text-plum/60">
-          這裡不是扣分區。受傷或心情不好時告訴他，他會關心妳的 ❤️
-        </p>
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          <button
-            className={`pressable rounded-xl border py-2.5 text-sm font-medium ${
-              careType === "意外受傷" ? "border-gold bg-gold/10" : "border-plum/15"
-            }`}
-            onClick={() => setCareType("意外受傷")}
-          >
-            🤕 意外受傷了
-          </button>
-          <button
-            className={`pressable rounded-xl border py-2.5 text-sm font-medium ${
-              careType === "傷害自己" ? "border-gold bg-gold/10" : "border-plum/15"
-            }`}
-            onClick={() => setCareType("傷害自己")}
-          >
-            💔 我傷害了自己
-          </button>
-        </div>
-        {careType && (
-          <div className="mt-3 space-y-2.5">
-            <textarea
-              value={careNote}
-              onChange={(e) => setCareNote(e.target.value)}
-              placeholder="想說的話（選填）"
-              rows={2}
-              className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-sm outline-none focus:border-gold"
-            />
-            <PhotoInput value={carePhoto} onChange={setCarePhoto} />
-            <button
-              className="pressable w-full rounded-xl bg-plum py-2.5 text-sm font-bold text-cream"
-              onClick={submitCare}
-              disabled={careBusy}
-            >
-              {careBusy ? "送出中…" : "告訴他 ❤️"}
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* 關懷訊息（30 天內 2 次以上傷害自己） */}
-      {showSupport && (
-        <div className="card mt-4 border border-gold/40 p-5">
-          <div className="text-sm font-bold">給妳一個大大的擁抱 🫂</div>
-          <p className="mt-2 text-sm leading-relaxed text-plum/70">
-            最近好像過得有點辛苦，謝謝妳願意說出來，這需要很大的勇氣。
-            妳不是一個人，他很在乎妳，我們也在乎妳。
-            如果心裡的重量有時候大到自己撐不住，找專業的人聊聊也是照顧自己的一種方式——
-            <span className="font-bold text-gold">安心專線 1925</span>（24 小時、免費），
-            隨時都有人願意聽妳說。妳值得被好好照顧。❤️
-          </p>
-          <button
-            className="pressable mt-3 w-full rounded-xl border border-plum/20 py-2 text-sm"
-            onClick={() => setShowSupport(false)}
-          >
-            我知道了，謝謝
-          </button>
-        </div>
-      )}
 
       {/* 快速記錄 modal */}
       {recordPreset && (

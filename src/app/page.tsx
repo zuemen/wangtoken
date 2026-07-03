@@ -68,7 +68,7 @@ export default function OverviewPage() {
     }
     const idx = new Map(days.map((d, i) => [d.date, i]));
     for (const e of entries) {
-      if (e.status !== "approved" || e.kind === "redeem" || e.kind === "care") continue;
+      if (e.status !== "approved" || e.kind === "redeem") continue;
       const key = fmt.format(new Date(e.created_at));
       const i = idx.get(key);
       if (i === undefined) continue;

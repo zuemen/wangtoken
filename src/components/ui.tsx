@@ -49,15 +49,11 @@ export function PhotoThumb({ path }: { path: string }) {
 /** 單筆帳目列 */
 export function EntryRow({ entry }: { entry: Entry }) {
   const positive = Number(entry.points) > 0;
-  const isCare = entry.kind === "care";
   return (
     <div className="passbook-divider flex items-center gap-3 py-3 last:border-b-0">
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="truncate text-sm font-medium">
-            {isCare ? "🩹 " : ""}
-            {entry.label}
-          </span>
+          <span className="truncate text-sm font-medium">{entry.label}</span>
           <StatusBadge status={entry.status} />
           {entry.kind === "redeem" && (
             <span
@@ -78,10 +74,10 @@ export function EntryRow({ entry }: { entry: Entry }) {
       {entry.photo_path && <PhotoThumb path={entry.photo_path} />}
       <div
         className={`shrink-0 text-right text-base font-bold ${
-          isCare ? "text-plum/40" : positive ? "text-mint" : Number(entry.points) < 0 ? "text-coral" : "text-plum/40"
+          positive ? "text-mint" : Number(entry.points) < 0 ? "text-coral" : "text-plum/40"
         }`}
       >
-        {isCare ? "關心" : fmtPoints(Number(entry.points))}
+        {fmtPoints(Number(entry.points))}
       </div>
     </div>
   );
