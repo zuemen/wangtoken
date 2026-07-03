@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-blush text-plum font-sans antialiased;
+}
+
+/* 存摺虛線分隔 */
+.passbook-divider {
+  border-bottom: 1.5px dashed rgba(199, 154, 61, 0.45);
+}
+
+/* 卡片 */
+.card {
+  @apply bg-cream rounded-2xl shadow-card;
+}
+
+/* 按鈕按下回饋 */
+.pressable {
+  @apply transition active:scale-95 disabled:opacity-50 disabled:active:scale-100;
+}
+
+/* confetti 動畫 */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) rotate(720deg);
+    opacity: 0.3;
+  }
+}
+.confetti-piece {
+  position: fixed;
+  top: 0;
+  width: 10px;
+  height: 14px;
+  border-radius: 2px;
+  animation: confetti-fall linear forwards;
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* toast 進場 */
+@keyframes toast-in {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.toast-item {
+  animation: toast-in 0.25s ease-out;
+}
