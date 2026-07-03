@@ -91,7 +91,7 @@ export default function GfPage() {
             >
               <div className="text-sm font-bold leading-snug">{p.label}</div>
               <div className="mt-1.5 flex items-center justify-between">
-                <span className="text-base font-black text-mint">{fmtPoints(Number(p.points))}</span>
+                <span className="text-base font-black text-mint-ink">{fmtPoints(Number(p.points))}</span>
                 <span className="text-[10px] text-plum/50">
                   {locked ? "🔒 今日已達上限" : left !== null ? `今日還可 ${left} 次` : p.requires_review ? "需審核" : ""}
                 </span>
@@ -108,7 +108,7 @@ export default function GfPage() {
           value={propName}
           onChange={(e) => setPropName(e.target.value)}
           placeholder="做了什麼呢？"
-          className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-sm outline-none focus:border-gold"
+          className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-base outline-none focus:border-gold"
         />
         <input
           value={propPoints}
@@ -117,7 +117,7 @@ export default function GfPage() {
           step="0.1"
           min="0.1"
           placeholder="建議分數（例：0.5）"
-          className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-sm outline-none focus:border-gold"
+          className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-base outline-none focus:border-gold"
         />
         <PhotoInput value={propPhoto} onChange={setPropPhoto} />
         <button
@@ -142,12 +142,12 @@ export default function GfPage() {
                 <span className="truncate text-sm font-medium">{e.label}</span>
                 <StatusBadge status={e.status} />
                 {e.status === "approved" && (
-                  <span className="rounded-full bg-mint/15 px-2 py-0.5 text-[11px] text-mint">已核准</span>
+                  <span className="rounded-full bg-mint/15 px-2 py-0.5 text-[11px] text-mint-ink">已核准</span>
                 )}
               </div>
               <div className="text-xs text-plum/50">{fmtTime(e.created_at)}</div>
             </div>
-            <div className="text-sm font-bold text-mint">{fmtPoints(Number(e.points))}</div>
+            <div className="text-sm font-bold text-mint-ink">{fmtPoints(Number(e.points))}</div>
           </div>
         ))}
       </div>
@@ -164,10 +164,10 @@ export default function GfPage() {
           >
             <div className="flex items-baseline justify-between">
               <div className="text-base font-bold">{recordPreset.label}</div>
-              <div className="text-lg font-black text-mint">{fmtPoints(Number(recordPreset.points))}</div>
+              <div className="text-lg font-black text-mint-ink">{fmtPoints(Number(recordPreset.points))}</div>
             </div>
             {recordPreset.requires_review && (
-              <div className="mt-1 text-xs text-gold">此項目需要他審核後才入帳</div>
+              <div className="mt-1 text-xs text-gold-ink">此項目需要他審核後才入帳</div>
             )}
             <div className="mt-3 space-y-2.5">
               <textarea
@@ -175,7 +175,7 @@ export default function GfPage() {
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="備註（選填）"
                 rows={2}
-                className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-sm outline-none focus:border-gold"
+                className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-base outline-none focus:border-gold"
               />
               <PhotoInput value={photo} onChange={setPhoto} />
               <button

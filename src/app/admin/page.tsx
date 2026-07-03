@@ -50,7 +50,7 @@ function PinForm({ onSuccess }: { onSuccess: () => void }) {
             className="w-full rounded-xl border border-gold/40 bg-white px-4 py-3 text-center outline-none focus:border-gold"
             autoFocus
           />
-          {error && <div className="mt-2 text-sm text-coral">{error}</div>}
+          {error && <div className="mt-2 text-sm text-coral-ink">{error}</div>}
           <button
             type="submit"
             className="pressable mt-4 w-full rounded-xl bg-plum py-3 font-bold text-cream"
@@ -113,7 +113,7 @@ function AdminPanel() {
             <span className="truncate text-xs font-medium">{p.label}</span>
             <span
               className={`ml-1 shrink-0 text-sm font-black ${
-                Number(p.points) > 0 ? "text-mint" : "text-coral"
+                Number(p.points) > 0 ? "text-mint-ink" : "text-coral-ink"
               }`}
             >
               {fmtPoints(Number(p.points))}
@@ -144,7 +144,7 @@ function AdminPanel() {
               <div className="text-xs text-plum/50">{fmtTime(e.created_at)}</div>
             </div>
             <button
-              className="pressable rounded-lg bg-mint px-3 py-1.5 text-xs font-bold text-white"
+              className="pressable rounded-lg bg-mint-ink px-3 py-1.5 text-xs font-bold text-white"
               onClick={() => act(e.id, () => postJSON(`/api/entries/${e.id}/fulfill`, { fulfilled: true }))}
               disabled={busyId === e.id}
             >
@@ -209,7 +209,7 @@ function CustomEntryForm({ onDone }: { onDone: () => void }) {
         value={label}
         onChange={(e) => setLabel(e.target.value)}
         placeholder="自訂項目"
-        className="min-w-0 flex-1 rounded-xl border border-gold/30 bg-white px-3 py-2 text-sm outline-none focus:border-gold"
+        className="min-w-0 flex-1 rounded-xl border border-gold/30 bg-white px-3 py-2 text-base outline-none focus:border-gold"
       />
       <input
         value={points}
@@ -217,7 +217,7 @@ function CustomEntryForm({ onDone }: { onDone: () => void }) {
         type="number"
         step="0.1"
         placeholder="±分數"
-        className="w-20 rounded-xl border border-gold/30 bg-white px-2 py-2 text-sm outline-none focus:border-gold"
+        className="w-20 rounded-xl border border-gold/30 bg-white px-2 py-2 text-base outline-none focus:border-gold"
       />
       <button
         type="submit"
@@ -266,19 +266,19 @@ function ReviewCard({ entry, onDone }: { entry: Entry; onDone: () => void }) {
           onChange={(e) => setPoints(e.target.value)}
           type="number"
           step="0.1"
-          className="w-20 rounded-lg border border-gold/30 bg-white px-2 py-1.5 text-sm outline-none focus:border-gold"
+          className="w-20 rounded-lg border border-gold/30 bg-white px-2 py-1.5 text-base outline-none focus:border-gold"
         />
         <span className="text-xs text-plum/50">分</span>
         <div className="flex-1" />
         <button
-          className="pressable rounded-lg bg-mint px-3 py-1.5 text-xs font-bold text-white"
+          className="pressable rounded-lg bg-mint-ink px-3 py-1.5 text-xs font-bold text-white"
           onClick={() => review("approve")}
           disabled={busy}
         >
           核准
         </button>
         <button
-          className="pressable rounded-lg border border-coral/40 px-3 py-1.5 text-xs text-coral"
+          className="pressable rounded-lg border border-coral/40 px-3 py-1.5 text-xs text-coral-ink"
           onClick={() => review("reject")}
           disabled={busy}
         >
@@ -352,7 +352,7 @@ function PresetManager({ presets, onDone }: { presets: Preset[]; onDone: () => v
               <select
                 value={form.type}
                 onChange={(e) => setForm({ ...form, type: e.target.value })}
-                className="rounded-lg border border-gold/30 bg-white px-2 py-2 text-sm"
+                className="rounded-lg border border-gold/30 bg-white px-2 py-2 text-base"
               >
                 <option value="bonus">加分</option>
                 <option value="deduct">扣分</option>
@@ -361,7 +361,7 @@ function PresetManager({ presets, onDone }: { presets: Preset[]; onDone: () => v
                 value={form.label}
                 onChange={(e) => setForm({ ...form, label: e.target.value })}
                 placeholder="項目名稱"
-                className="min-w-0 flex-1 rounded-lg border border-gold/30 bg-white px-2 py-2 text-sm outline-none"
+                className="min-w-0 flex-1 rounded-lg border border-gold/30 bg-white px-2 py-2 text-base outline-none"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -369,13 +369,13 @@ function PresetManager({ presets, onDone }: { presets: Preset[]; onDone: () => v
                 value={form.points}
                 onChange={(e) => setForm({ ...form, points: e.target.value })}
                 type="number" step="0.1" placeholder="分數"
-                className="w-20 rounded-lg border border-gold/30 bg-white px-2 py-2 text-sm outline-none"
+                className="w-20 rounded-lg border border-gold/30 bg-white px-2 py-2 text-base outline-none"
               />
               <input
                 value={form.dailyLimit}
                 onChange={(e) => setForm({ ...form, dailyLimit: e.target.value })}
                 type="number" min="1" placeholder="每日上限"
-                className="w-24 rounded-lg border border-gold/30 bg-white px-2 py-2 text-sm outline-none"
+                className="w-24 rounded-lg border border-gold/30 bg-white px-2 py-2 text-base outline-none"
               />
               <label className="flex items-center gap-1 text-xs text-plum/70">
                 <input
@@ -396,7 +396,7 @@ function PresetManager({ presets, onDone }: { presets: Preset[]; onDone: () => v
           </form>
           {presets.filter((p) => p.active).map((p) => (
             <div key={p.id} className="card flex items-center gap-2 p-3">
-              <span className={`text-sm font-black ${p.type === "bonus" ? "text-mint" : "text-coral"}`}>
+              <span className={`text-sm font-black ${p.type === "bonus" ? "text-mint-ink" : "text-coral-ink"}`}>
                 {fmtPoints(Number(p.points))}
               </span>
               <span className="min-w-0 flex-1 truncate text-sm">{p.label}</span>
@@ -404,8 +404,8 @@ function PresetManager({ presets, onDone }: { presets: Preset[]; onDone: () => v
                 {p.daily_limit != null && `限${p.daily_limit}/日`}
                 {p.requires_review && "・審"}
               </span>
-              <button className="pressable text-xs text-gold" onClick={() => update(p)}>編輯</button>
-              <button className="pressable text-xs text-coral" onClick={() => remove(p)}>停用</button>
+              <button className="pressable px-2 py-2 text-xs text-gold-ink" onClick={() => update(p)}>編輯</button>
+              <button className="pressable px-2 py-2 text-xs text-coral-ink" onClick={() => remove(p)}>停用</button>
             </div>
           ))}
         </div>
@@ -476,19 +476,19 @@ function RewardManager({ rewards, onDone }: { rewards: Reward[]; onDone: () => v
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               placeholder="獎品名稱"
-              className="min-w-0 flex-1 rounded-lg border border-gold/30 bg-white px-2 py-2 text-sm outline-none"
+              className="min-w-0 flex-1 rounded-lg border border-gold/30 bg-white px-2 py-2 text-base outline-none"
             />
             <input
               value={form.cost}
               onChange={(e) => setForm({ ...form, cost: e.target.value })}
               type="number" step="0.1" min="0.1" placeholder="點數"
-              className="w-16 rounded-lg border border-gold/30 bg-white px-2 py-2 text-sm outline-none"
+              className="w-16 rounded-lg border border-gold/30 bg-white px-2 py-2 text-base outline-none"
             />
             <input
               value={form.marketPrice}
               onChange={(e) => setForm({ ...form, marketPrice: e.target.value })}
               type="number" placeholder="市值NT$"
-              className="w-20 rounded-lg border border-gold/30 bg-white px-2 py-2 text-sm outline-none"
+              className="w-20 rounded-lg border border-gold/30 bg-white px-2 py-2 text-base outline-none"
             />
             <button
               type="submit"
@@ -502,9 +502,9 @@ function RewardManager({ rewards, onDone }: { rewards: Reward[]; onDone: () => v
             <div key={rw.id} className="card flex items-center gap-2 p-3">
               <span className="text-lg">{rw.icon ?? "🎁"}</span>
               <span className="min-w-0 flex-1 truncate text-sm">{rw.name}</span>
-              <span className="text-sm font-black text-gold">{Number(rw.cost).toFixed(1)}</span>
-              <button className="pressable text-xs text-gold" onClick={() => update(rw)}>編輯</button>
-              <button className="pressable text-xs text-coral" onClick={() => remove(rw)}>下架</button>
+              <span className="text-sm font-black text-gold-ink">{Number(rw.cost).toFixed(1)}</span>
+              <button className="pressable px-2 py-2 text-xs text-gold-ink" onClick={() => update(rw)}>編輯</button>
+              <button className="pressable px-2 py-2 text-xs text-coral-ink" onClick={() => remove(rw)}>下架</button>
             </div>
           ))}
         </div>
@@ -534,7 +534,7 @@ function ResetButton({ onDone }: { onDone: () => void }) {
   return (
     <>
       <button
-        className="pressable w-full rounded-xl border border-coral/40 py-2.5 text-sm font-medium text-coral"
+        className="pressable w-full rounded-xl border border-coral/40 py-2.5 text-sm font-medium text-coral-ink"
         onClick={() => setStep(1)}
       >
         🗑️ 重置帳本資料
@@ -545,7 +545,7 @@ function ResetButton({ onDone }: { onDone: () => void }) {
           onClick={() => { if (!busy) { setStep(0); setText(""); } }}
         >
           <div className="card w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()}>
-            <div className="text-base font-bold text-coral">確定要清空所有帳本紀錄？</div>
+            <div className="text-base font-bold text-coral-ink">確定要清空所有帳本紀錄？</div>
             <p className="mt-2 text-sm text-plum/70">
               此動作無法復原。預設項目與獎品會保留。請輸入「確認重置」四個字。
             </p>
@@ -564,7 +564,7 @@ function ResetButton({ onDone }: { onDone: () => void }) {
                 取消
               </button>
               <button
-                className="pressable flex-1 rounded-xl bg-coral py-2.5 text-sm font-bold text-white"
+                className="pressable flex-1 rounded-xl bg-coral-ink py-2.5 text-sm font-bold text-white"
                 onClick={doReset}
                 disabled={busy || text !== "確認重置"}
               >

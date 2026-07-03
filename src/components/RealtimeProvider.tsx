@@ -63,7 +63,11 @@ export default function RealtimeProvider({ children }: { children: React.ReactNo
   return (
     <ToastCtx.Provider value={addToast}>
       {children}
-      <div className="fixed bottom-24 left-1/2 z-50 flex w-[92%] max-w-md -translate-x-1/2 flex-col gap-2">
+      <div
+        className="fixed bottom-24 left-1/2 z-50 flex w-[92%] max-w-md -translate-x-1/2 flex-col gap-2"
+        role="status"
+        aria-live="polite"
+      >
         {toasts.map((t) => (
           <div
             key={t.id}

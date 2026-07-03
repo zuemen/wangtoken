@@ -18,7 +18,20 @@ body {
 
 /* 按鈕按下回饋 */
 .pressable {
-  @apply transition active:scale-95 disabled:opacity-50 disabled:active:scale-100;
+  @apply cursor-pointer transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100;
+}
+
+/* 尊重系統減少動態偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .confetti-piece {
+    display: none;
+  }
+  .toast-item {
+    animation: none;
+  }
+  .pressable {
+    @apply transition-none active:scale-100;
+  }
 }
 
 /* confetti 動畫 */

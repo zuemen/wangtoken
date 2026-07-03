@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Entry } from "@/lib/types";
 import { fmtPoints, fmtTime } from "@/lib/format";
 
 export function StatusBadge({ status }: { status: Entry["status"] }) {
   if (status === "pending")
-    return <span className="rounded-full bg-gold/20 px-2 py-0.5 text-[11px] font-medium text-gold">待審核</span>;
+    return <span className="rounded-full bg-gold/20 px-2 py-0.5 text-[11px] font-medium text-gold-ink">待審核</span>;
   if (status === "rejected")
-    return <span className="rounded-full bg-coral/15 px-2 py-0.5 text-[11px] font-medium text-coral">已拒絕</span>;
+    return <span className="rounded-full bg-coral/15 px-2 py-0.5 text-[11px] font-medium text-coral-ink">已拒絕</span>;
   return null;
 }
 
@@ -24,18 +24,37 @@ export function ActorBadge({ actor }: { actor: Entry["actor"] }) {
 export function PhotoThumb({ path }: { path: string }) {
   const [open, setOpen] = useState(false);
   const src = `/api/photos/${path}`;
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
   return (
     <>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={src}
-        alt="照片"
-        className="h-12 w-12 cursor-pointer rounded-lg border border-gold/30 object-cover"
+      <button
+        type="button"
+        className="pressable shrink-0"
         onClick={() => setOpen(true)}
-      />
+        aria-label="查看照片大圖"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={src}
+          alt="照片"
+          className="h-12 w-12 rounded-lg border border-gold/30 object-cover"
+        />
+      </button>
       {open && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-plum/80 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="照片大圖（點擊或按 Esc 關閉）"
           onClick={() => setOpen(false)}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -58,7 +77,7 @@ export function EntryRow({ entry }: { entry: Entry }) {
           {entry.kind === "redeem" && (
             <span
               className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                entry.fulfilled ? "bg-mint/15 text-mint" : "bg-gold/20 text-gold"
+                entry.fulfilled ? "bg-mint/15 text-mint-ink" : "bg-gold/20 text-gold-ink"
               }`}
             >
               {entry.fulfilled ? "已完成" : "待出貨"}
@@ -74,7 +93,7 @@ export function EntryRow({ entry }: { entry: Entry }) {
       {entry.photo_path && <PhotoThumb path={entry.photo_path} />}
       <div
         className={`shrink-0 text-right text-base font-bold ${
-          positive ? "text-mint" : Number(entry.points) < 0 ? "text-coral" : "text-plum/40"
+          positive ? "text-mint-ink" : Number(entry.points) < 0 ? "text-coral-ink" : "text-plum/40"
         }`}
       >
         {fmtPoints(Number(entry.points))}

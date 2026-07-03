@@ -65,7 +65,7 @@ export default function RewardsPage() {
     <div>
       <h1 className="text-xl font-black">🎁 兌換所</h1>
       <div className="mt-1 text-sm text-plum/60">
-        目前餘額 <span className="font-bold text-gold">{balance.toFixed(1)} 分</span>
+        目前餘額 <span className="font-bold text-gold-ink">{balance.toFixed(1)} 分</span>
       </div>
 
       {/* 獎品牆 */}
@@ -82,13 +82,13 @@ export default function RewardsPage() {
               <div className="text-3xl">{r.icon ?? "🎁"}</div>
               <div className="mt-2 text-sm font-bold leading-tight">{r.name}</div>
               <div className="mt-1.5 flex items-baseline gap-1">
-                <span className="text-lg font-black text-gold">{Number(r.cost).toFixed(1)}</span>
+                <span className="text-lg font-black text-gold-ink">{Number(r.cost).toFixed(1)}</span>
                 <span className="text-xs text-plum/50">分</span>
               </div>
               {r.market_price != null && (
                 <div className="text-[11px] text-plum/40">市值約 NT${r.market_price.toLocaleString()}</div>
               )}
-              {!afford && <div className="mt-1 text-[11px] text-coral">🔒 還差 {(Number(r.cost) - balance).toFixed(1)} 分</div>}
+              {!afford && <div className="mt-1 text-[11px] text-coral-ink">🔒 還差 {(Number(r.cost) - balance).toFixed(1)} 分</div>}
             </button>
           );
         })}
@@ -106,12 +106,12 @@ export default function RewardsPage() {
             </div>
             <span
               className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                e.fulfilled ? "bg-mint/15 text-mint" : "bg-gold/20 text-gold"
+                e.fulfilled ? "bg-mint/15 text-mint-ink" : "bg-gold/20 text-gold-ink"
               }`}
             >
               {e.fulfilled ? "已完成" : "待出貨"}
             </span>
-            <div className="text-sm font-bold text-coral">{Number(e.points).toFixed(1)}</div>
+            <div className="text-sm font-bold text-coral-ink">{Number(e.points).toFixed(1)}</div>
           </div>
         ))}
       </div>
@@ -123,19 +123,19 @@ export default function RewardsPage() {
           value={wishName}
           onChange={(e) => setWishName(e.target.value)}
           placeholder="想要什麼呢？"
-          className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-sm outline-none focus:border-gold"
+          className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-base outline-none focus:border-gold"
         />
         <input
           value={wishUrl}
           onChange={(e) => setWishUrl(e.target.value)}
           placeholder="商品連結（選填）"
-          className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-sm outline-none focus:border-gold"
+          className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-base outline-none focus:border-gold"
         />
         <input
           value={wishNote}
           onChange={(e) => setWishNote(e.target.value)}
           placeholder="備註（選填）"
-          className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-sm outline-none focus:border-gold"
+          className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-base outline-none focus:border-gold"
         />
         <button
           type="submit"
@@ -152,14 +152,14 @@ export default function RewardsPage() {
               <div className="flex items-center gap-1.5">
                 <span className="truncate text-sm font-medium">{w.name}</span>
                 {w.status === "added" && (
-                  <span className="rounded-full bg-mint/15 px-2 py-0.5 text-[11px] text-mint">已上架</span>
+                  <span className="rounded-full bg-mint/15 px-2 py-0.5 text-[11px] text-mint-ink">已上架</span>
                 )}
                 {w.status === "rejected" && (
-                  <span className="rounded-full bg-coral/15 px-2 py-0.5 text-[11px] text-coral">婉拒</span>
+                  <span className="rounded-full bg-coral/15 px-2 py-0.5 text-[11px] text-coral-ink">婉拒</span>
                 )}
               </div>
               {w.url && (
-                <a href={w.url} target="_blank" rel="noreferrer" className="text-xs text-gold underline">
+                <a href={w.url} target="_blank" rel="noreferrer" className="text-xs text-gold-ink underline">
                   查看連結
                 </a>
               )}
@@ -168,13 +168,13 @@ export default function RewardsPage() {
             {isAdmin && w.status === "open" && (
               <div className="flex shrink-0 gap-1.5">
                 <button
-                  className="pressable rounded-lg bg-mint px-2.5 py-1.5 text-xs font-bold text-white"
+                  className="pressable rounded-lg bg-mint-ink px-2.5 py-1.5 text-xs font-bold text-white"
                   onClick={() => handleWish(w, "accept")}
                 >
                   轉成獎品
                 </button>
                 <button
-                  className="pressable rounded-lg border border-coral/40 px-2.5 py-1.5 text-xs text-coral"
+                  className="pressable rounded-lg border border-coral/40 px-2.5 py-1.5 text-xs text-coral-ink"
                   onClick={() => handleWish(w, "reject")}
                 >
                   婉拒

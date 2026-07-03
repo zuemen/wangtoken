@@ -41,7 +41,7 @@ export default function GatePage() {
             className="w-full rounded-xl border border-gold/40 bg-white px-4 py-3 text-center text-base outline-none focus:border-gold"
             autoFocus
           />
-          {error && <div className="mt-2 text-sm text-coral">{error}</div>}
+          {error && <div className="mt-2 text-sm text-coral-ink">{error}</div>}
           <button
             type="submit"
             className="pressable mt-4 w-full rounded-xl bg-plum py-3 font-bold text-cream"

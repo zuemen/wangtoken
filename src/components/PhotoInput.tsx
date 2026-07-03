@@ -82,7 +82,7 @@ export default function PhotoInput({
           />
           <button
             type="button"
-            className="pressable rounded-lg border border-coral/40 px-3 py-1.5 text-xs text-coral"
+            className="pressable rounded-lg border border-coral/40 px-3 py-1.5 text-xs text-coral-ink"
             onClick={() => onChange(null)}
           >
             移除
@@ -98,7 +98,7 @@ export default function PhotoInput({
           {uploading ? "壓縮上傳中…" : "📷 附上照片（選填）"}
         </button>
       )}
-      {error && <div className="mt-1 text-xs text-coral">{error}</div>}
+      {error && <div className="mt-1 text-xs text-coral-ink">{error}</div>}
     </div>
   );
 }

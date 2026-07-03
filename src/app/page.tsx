@@ -87,7 +87,7 @@ export default function OverviewPage() {
       {celebrate && (
         <>
           <Confetti />
-          <div className="card mb-4 border border-gold/50 p-4 text-center text-sm font-bold text-gold">
+          <div className="card mb-4 border border-gold/50 p-4 text-center text-sm font-bold text-gold-ink">
             🔥 連續 7 天乖乖聽話達成！+1.0 分入帳 🎉
           </div>
         </>
@@ -101,7 +101,7 @@ export default function OverviewPage() {
           <span className="text-5xl font-black tabular-nums">{balance.toFixed(1)}</span>
           <span className="text-lg font-bold text-plum/60">分</span>
         </div>
-        <div className="mt-1 text-sm font-medium text-gold">約 {fmtNTD(balance)}</div>
+        <div className="mt-1 text-sm font-medium text-gold-ink">約 {fmtNTD(balance)}</div>
       </div>
 
       {/* 本週迷你長條圖 */}
@@ -141,7 +141,7 @@ export default function OverviewPage() {
           <button
             key={f.key}
             onClick={() => setFilter(f.key)}
-            className={`pressable shrink-0 rounded-full px-3.5 py-1.5 text-xs font-medium ${
+            className={`pressable shrink-0 rounded-full px-4 py-2.5 text-xs font-medium ${
               filter === f.key ? "bg-plum text-cream" : "bg-cream text-plum/60"
             }`}
           >
