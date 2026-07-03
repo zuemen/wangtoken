@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useData, postJSON } from "@/lib/useData";
 import { useToast } from "@/components/RealtimeProvider";
-import { SectionTitle, StatusBadge } from "@/components/ui";
+import { SectionTitle, Skeleton, StatusBadge } from "@/components/ui";
 import PhotoInput from "@/components/PhotoInput";
 import { fmtPoints, fmtTime } from "@/lib/format";
 import type { Preset } from "@/lib/types";
@@ -69,6 +69,21 @@ export default function GfPage() {
       toast("提案送出，等他審核 💌");
       refetch();
     } else toast(r.error!);
+  }
+
+  if (!data) {
+    return (
+      <div className="space-y-4 pt-2" aria-busy="true" aria-label="載入中">
+        <Skeleton className="h-8 w-32" />
+        <div className="grid grid-cols-2 gap-2.5">
+          <Skeleton className="h-20" />
+          <Skeleton className="h-20" />
+          <Skeleton className="h-20" />
+          <Skeleton className="h-20" />
+        </div>
+        <Skeleton className="h-48" />
+      </div>
+    );
   }
 
   return (

@@ -22,5 +22,8 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.png|.*\\.svg).*)"],
+  // 放行 Next 靜態資源與 PWA 資產（manifest／圖示），其餘一律過閘門
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|apple-touch-icon.png|icons/|.*\\.svg|.*\\.png).*)",
+  ],
 };

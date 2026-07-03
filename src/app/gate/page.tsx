@@ -51,6 +51,11 @@ export default function GatePage() {
           </button>
         </form>
       </div>
+      <p className="mt-6 text-center text-xs text-plum/40">
+        為我們兩個人打造的小小銀行
+        <br />
+        可加入手機主畫面當 App 使用 📱
+      </p>
     </div>
   );
 }

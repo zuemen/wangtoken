@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useData, postJSON } from "@/lib/useData";
 import { useToast } from "@/components/RealtimeProvider";
-import { ConfirmModal, SectionTitle } from "@/components/ui";
+import { ConfirmModal, Field, SectionTitle, SheetModal, Skeleton } from "@/components/ui";
 import { fmtTime } from "@/lib/format";
 import type { Reward, Wish } from "@/lib/types";
 
@@ -48,17 +48,27 @@ export default function RewardsPage() {
     } else toast(r.error!);
   }
 
-  async function handleWish(w: Wish, action: "accept" | "reject") {
-    if (action === "accept") {
-      const cost = window.prompt(`「${w.name}」要幾分兌換？`, "5");
-      if (cost == null) return;
-      const r = await postJSON(`/api/wishes/${w.id}`, { action, cost: Number(cost) });
-      toast(r.ok ? "已上架成獎品 🎁" : r.error!);
-    } else {
-      const r = await postJSON(`/api/wishes/${w.id}`, { action });
-      toast(r.ok ? "已婉拒" : r.error!);
-    }
+  const [acceptWish, setAcceptWish] = useState<Wish | null>(null);
+
+  async function rejectWish(w: Wish) {
+    const r = await postJSON(`/api/wishes/${w.id}`, { action: "reject" });
+    toast(r.ok ? "已婉拒" : r.error!);
     refetch();
+  }
+
+  if (!data) {
+    return (
+      <div className="space-y-4 pt-2" aria-busy="true" aria-label="載入中">
+        <Skeleton className="h-8 w-32" />
+        <div className="grid grid-cols-2 gap-3">
+          <Skeleton className="h-36" />
+          <Skeleton className="h-36" />
+          <Skeleton className="h-36" />
+          <Skeleton className="h-36" />
+        </div>
+        <Skeleton className="h-24" />
+      </div>
+    );
   }
 
   return (
@@ -169,13 +179,13 @@ export default function RewardsPage() {
               <div className="flex shrink-0 gap-1.5">
                 <button
                   className="pressable rounded-lg bg-mint-ink px-2.5 py-1.5 text-xs font-bold text-white"
-                  onClick={() => handleWish(w, "accept")}
+                  onClick={() => setAcceptWish(w)}
                 >
                   轉成獎品
                 </button>
                 <button
                   className="pressable rounded-lg border border-coral/40 px-2.5 py-1.5 text-xs text-coral-ink"
-                  onClick={() => handleWish(w, "reject")}
+                  onClick={() => rejectWish(w)}
                 >
                   婉拒
                 </button>
@@ -184,6 +194,18 @@ export default function RewardsPage() {
           </div>
         ))}
       </div>
+
+      {acceptWish && (
+        <WishAcceptModal
+          wish={acceptWish}
+          onClose={() => setAcceptWish(null)}
+          onSaved={() => {
+            setAcceptWish(null);
+            toast("已上架成獎品 🎁");
+            refetch();
+          }}
+        />
+      )}
 
       {confirmReward && (
         <ConfirmModal
@@ -196,5 +218,84 @@ export default function RewardsPage() {
         />
       )}
     </div>
+  );
+}
+
+/* ---------- 願望轉獎品 modal ---------- */
+function WishAcceptModal({
+  wish,
+  onClose,
+  onSaved,
+}: {
+  wish: Wish;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const toast = useToast();
+  const [form, setForm] = useState({ icon: "🎁", cost: "", marketPrice: "" });
+  const [busy, setBusy] = useState(false);
+
+  async function save(e: React.FormEvent) {
+    e.preventDefault();
+    if (busy) return;
+    const cost = Number(form.cost);
+    if (!Number.isFinite(cost) || cost <= 0) {
+      toast("請填正確的兌換點數");
+      return;
+    }
+    setBusy(true);
+    const r = await postJSON(`/api/wishes/${wish.id}`, {
+      action: "accept",
+      icon: form.icon || "🎁",
+      cost,
+      marketPrice: form.marketPrice === "" ? null : Number(form.marketPrice),
+    });
+    setBusy(false);
+    if (r.ok) onSaved();
+    else toast(r.error!);
+  }
+
+  return (
+    <SheetModal title={`把「${wish.name}」上架成獎品`} onClose={onClose}>
+      <form onSubmit={save} className="space-y-3">
+        <div className="grid grid-cols-[4.5rem_1fr] gap-3">
+          <Field label="圖示">
+            <input
+              value={form.icon}
+              onChange={(e) => setForm({ ...form, icon: e.target.value })}
+              className="w-full rounded-xl border border-gold/30 bg-white px-2 py-2.5 text-center text-base outline-none focus:border-gold"
+            />
+          </Field>
+          <Field label="兌換點數">
+            <input
+              value={form.cost}
+              onChange={(e) => setForm({ ...form, cost: e.target.value })}
+              type="number"
+              step="0.1"
+              min="0.1"
+              placeholder="例：5"
+              autoFocus
+              className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-base outline-none focus:border-gold"
+            />
+          </Field>
+        </div>
+        <Field label="市值 NT$（選填）">
+          <input
+            value={form.marketPrice}
+            onChange={(e) => setForm({ ...form, marketPrice: e.target.value })}
+            type="number"
+            min="0"
+            className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-base outline-none focus:border-gold"
+          />
+        </Field>
+        <button
+          type="submit"
+          className="pressable w-full rounded-xl bg-plum py-3 text-sm font-bold text-cream"
+          disabled={busy || !form.cost}
+        >
+          {busy ? "上架中…" : "上架 🎁"}
+        </button>
+      </form>
+    </SheetModal>
   );
 }

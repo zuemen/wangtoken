@@ -147,3 +147,65 @@ export function ConfirmModal({
 export function SectionTitle({ children }: { children: React.ReactNode }) {
   return <h2 className="mb-2 mt-6 text-sm font-bold tracking-wide text-plum/70">{children}</h2>;
 }
+
+/** 底部彈出表單容器（手機 bottom sheet / 桌面置中），Esc 可關閉 */
+export function SheetModal({
+  title,
+  onClose,
+  children,
+}: {
+  title: string;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-plum/60 sm:items-center"
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
+      onClick={onClose}
+    >
+      <div
+        className="card max-h-[85dvh] w-full max-w-md overflow-y-auto rounded-b-none p-5 sm:rounded-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between">
+          <div className="text-base font-bold">{title}</div>
+          <button
+            type="button"
+            className="pressable -mr-2 rounded-lg px-2 py-1 text-lg text-plum/50"
+            onClick={onClose}
+            aria-label="關閉"
+          >
+            ✕
+          </button>
+        </div>
+        <div className="mt-3">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+/** 表單欄位標籤（正式表單一律有可見 label） */
+export function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-xs font-medium text-plum/70">{label}</span>
+      {children}
+    </label>
+  );
+}
+
+/** 骨架屏 */
+export function Skeleton({ className = "" }: { className?: string }) {
+  return <div className={`animate-pulse rounded-xl bg-plum/10 ${className}`} aria-hidden="true" />;
+}

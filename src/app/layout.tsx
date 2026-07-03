@@ -4,8 +4,16 @@ import RealtimeProvider from "@/components/RealtimeProvider";
 import BottomNav from "@/components/BottomNav";
 
 export const metadata: Metadata = {
-  title: "胖呆積點器",
+  title: { default: "胖呆積點器", template: "%s｜胖呆積點器" },
   description: "我們兩個人的點數存摺",
+  manifest: "/manifest.webmanifest",
+  // 私人應用：不讓搜尋引擎索引
+  robots: { index: false, follow: false },
+  appleWebApp: { capable: true, title: "胖呆積點器", statusBarStyle: "default" },
+  icons: {
+    icon: [{ url: "/favicon.png", type: "image/png" }],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
 };
 
 export const viewport: Viewport = {

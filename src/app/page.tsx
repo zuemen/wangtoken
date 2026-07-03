@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useData, postJSON } from "@/lib/useData";
 import { fmtNTD, fmtPoints } from "@/lib/format";
-import { EntryRow, SectionTitle } from "@/components/ui";
+import { EntryRow, SectionTitle, Skeleton } from "@/components/ui";
 import Confetti from "@/components/Confetti";
 import type { Entry } from "@/lib/types";
 
@@ -81,6 +81,18 @@ export default function OverviewPage() {
 
   const maxBar = Math.max(0.5, ...weekly.flatMap((d) => [d.plus, d.minus]));
   const balance = Number(data?.balance ?? 0);
+
+  if (!data) {
+    return (
+      <div className="space-y-4 pt-2" aria-busy="true" aria-label="載入中">
+        <Skeleton className="h-36" />
+        <Skeleton className="h-6 w-24" />
+        <Skeleton className="h-32" />
+        <Skeleton className="h-6 w-24" />
+        <Skeleton className="h-48" />
+      </div>
+    );
+  }
 
   return (
     <div>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useData, postJSON } from "@/lib/useData";
 import { useToast } from "@/components/RealtimeProvider";
-import { SectionTitle } from "@/components/ui";
+import { ConfirmModal, Field, SectionTitle, SheetModal, Skeleton } from "@/components/ui";
 import { fmtPoints, fmtTime } from "@/lib/format";
 import type { Entry, Preset, Reward } from "@/lib/types";
 
@@ -11,7 +11,19 @@ export default function AdminPage() {
   const { data, refetch } = useData();
 
   if (!data) {
-    return <div className="py-16 text-center text-sm text-plum/40">讀取中…</div>;
+    return (
+      <div className="space-y-4 pt-2" aria-busy="true" aria-label="載入中">
+        <Skeleton className="h-8 w-40" />
+        <div className="grid grid-cols-2 gap-2">
+          <Skeleton className="h-14" />
+          <Skeleton className="h-14" />
+          <Skeleton className="h-14" />
+          <Skeleton className="h-14" />
+        </div>
+        <Skeleton className="h-24" />
+        <Skeleton className="h-24" />
+      </div>
+    );
   }
   if (!data.isAdmin) {
     return <PinForm onSuccess={refetch} />;
@@ -315,25 +327,16 @@ function PresetManager({ presets, onDone }: { presets: Preset[]; onDone: () => v
     } else toast(r.error!);
   }
 
-  async function update(p: Preset) {
-    const label = window.prompt("項目名稱", p.label);
-    if (label == null) return;
-    const pts = window.prompt("分數（負數＝扣分）", String(Number(p.points)));
-    if (pts == null) return;
-    const limit = window.prompt("每日上限（留空＝無限制）", p.daily_limit == null ? "" : String(p.daily_limit));
-    if (limit == null) return;
-    const r = await postJSON(`/api/presets/${p.id}`, {
-      label,
-      points: Number(pts),
-      dailyLimit: limit === "" ? null : Number(limit),
-    }, "PATCH");
-    toast(r.ok ? "已更新 ✅" : r.error!);
-    onDone();
-  }
+  const [editing, setEditing] = useState<Preset | null>(null);
+  const [disabling, setDisabling] = useState<Preset | null>(null);
+  const [disableBusy, setDisableBusy] = useState(false);
 
-  async function remove(p: Preset) {
-    if (!window.confirm(`停用「${p.label}」？`)) return;
-    const r = await postJSON(`/api/presets/${p.id}`, undefined, "DELETE");
+  async function disable() {
+    if (!disabling || disableBusy) return;
+    setDisableBusy(true);
+    const r = await postJSON(`/api/presets/${disabling.id}`, undefined, "DELETE");
+    setDisableBusy(false);
+    setDisabling(null);
     toast(r.ok ? "已停用" : r.error!);
     onDone();
   }
@@ -404,13 +407,141 @@ function PresetManager({ presets, onDone }: { presets: Preset[]; onDone: () => v
                 {p.daily_limit != null && `限${p.daily_limit}/日`}
                 {p.requires_review && "・審"}
               </span>
-              <button className="pressable px-2 py-2 text-xs text-gold-ink" onClick={() => update(p)}>編輯</button>
-              <button className="pressable px-2 py-2 text-xs text-coral-ink" onClick={() => remove(p)}>停用</button>
+              <button className="pressable px-2 py-2 text-xs text-gold-ink" onClick={() => setEditing(p)}>編輯</button>
+              <button className="pressable px-2 py-2 text-xs text-coral-ink" onClick={() => setDisabling(p)}>停用</button>
             </div>
           ))}
         </div>
       )}
+      {editing && (
+        <PresetEditModal
+          preset={editing}
+          onClose={() => setEditing(null)}
+          onSaved={() => {
+            setEditing(null);
+            onDone();
+          }}
+        />
+      )}
+      {disabling && (
+        <ConfirmModal
+          title={`停用「${disabling.label}」？`}
+          body="停用後女友專區與快速記帳將不再顯示此項目；已記的歷史紀錄不受影響，之後可請工程師從資料庫恢復。"
+          confirmText="確定停用"
+          busy={disableBusy}
+          onConfirm={disable}
+          onCancel={() => setDisabling(null)}
+        />
+      )}
     </>
+  );
+}
+
+/* ---------- 預設項目編輯 modal ---------- */
+function PresetEditModal({
+  preset,
+  onClose,
+  onSaved,
+}: {
+  preset: Preset;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const toast = useToast();
+  const [form, setForm] = useState({
+    type: preset.type as string,
+    label: preset.label,
+    points: String(Number(preset.points)),
+    dailyLimit: preset.daily_limit == null ? "" : String(preset.daily_limit),
+    requiresReview: preset.requires_review,
+  });
+  const [busy, setBusy] = useState(false);
+
+  async function save(e: React.FormEvent) {
+    e.preventDefault();
+    if (busy) return;
+    const pts = Number(form.points);
+    if (!form.label.trim() || !Number.isFinite(pts) || pts === 0) {
+      toast("請填名稱與非零分數");
+      return;
+    }
+    setBusy(true);
+    const r = await postJSON(
+      `/api/presets/${preset.id}`,
+      {
+        type: form.type,
+        label: form.label,
+        points: pts,
+        dailyLimit: form.dailyLimit === "" ? null : Number(form.dailyLimit),
+        requiresReview: form.requiresReview,
+      },
+      "PATCH"
+    );
+    setBusy(false);
+    if (r.ok) {
+      toast("已更新 ✅");
+      onSaved();
+    } else toast(r.error!);
+  }
+
+  return (
+    <SheetModal title="編輯項目" onClose={onClose}>
+      <form onSubmit={save} className="space-y-3">
+        <Field label="類型">
+          <select
+            value={form.type}
+            onChange={(e) => setForm({ ...form, type: e.target.value })}
+            className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-base outline-none focus:border-gold"
+          >
+            <option value="bonus">加分</option>
+            <option value="deduct">扣分</option>
+          </select>
+        </Field>
+        <Field label="項目名稱">
+          <input
+            value={form.label}
+            onChange={(e) => setForm({ ...form, label: e.target.value })}
+            className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-base outline-none focus:border-gold"
+          />
+        </Field>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="分數（負數＝扣分）">
+            <input
+              value={form.points}
+              onChange={(e) => setForm({ ...form, points: e.target.value })}
+              type="number"
+              step="0.1"
+              className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-base outline-none focus:border-gold"
+            />
+          </Field>
+          <Field label="每日上限（留空＝不限）">
+            <input
+              value={form.dailyLimit}
+              onChange={(e) => setForm({ ...form, dailyLimit: e.target.value })}
+              type="number"
+              min="1"
+              className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-base outline-none focus:border-gold"
+            />
+          </Field>
+        </div>
+        <label className="flex items-center gap-2 text-sm text-plum/80">
+          <input
+            type="checkbox"
+            checked={form.requiresReview}
+            onChange={(e) => setForm({ ...form, requiresReview: e.target.checked })}
+            className="h-4 w-4"
+          />
+          記錄後需管理者審核才入帳
+        </label>
+        <button
+          type="submit"
+          className="pressable w-full rounded-xl bg-plum py-3 text-sm font-bold text-cream"
+          disabled={busy}
+        >
+          {busy ? "儲存中…" : "儲存變更"}
+        </button>
+      </form>
+    </SheetModal>
   );
 }
 
@@ -439,19 +570,16 @@ function RewardManager({ rewards, onDone }: { rewards: Reward[]; onDone: () => v
     } else toast(r.error!);
   }
 
-  async function update(rw: Reward) {
-    const name = window.prompt("獎品名稱", rw.name);
-    if (name == null) return;
-    const cost = window.prompt("兌換點數", String(Number(rw.cost)));
-    if (cost == null) return;
-    const r = await postJSON(`/api/rewards/${rw.id}`, { name, cost: Number(cost) }, "PATCH");
-    toast(r.ok ? "已更新 ✅" : r.error!);
-    onDone();
-  }
+  const [editing, setEditing] = useState<Reward | null>(null);
+  const [removing, setRemoving] = useState<Reward | null>(null);
+  const [removeBusy, setRemoveBusy] = useState(false);
 
-  async function remove(rw: Reward) {
-    if (!window.confirm(`下架「${rw.name}」？`)) return;
-    const r = await postJSON(`/api/rewards/${rw.id}`, undefined, "DELETE");
+  async function doRemove() {
+    if (!removing || removeBusy) return;
+    setRemoveBusy(true);
+    const r = await postJSON(`/api/rewards/${removing.id}`, undefined, "DELETE");
+    setRemoveBusy(false);
+    setRemoving(null);
     toast(r.ok ? "已下架" : r.error!);
     onDone();
   }
@@ -503,13 +631,130 @@ function RewardManager({ rewards, onDone }: { rewards: Reward[]; onDone: () => v
               <span className="text-lg">{rw.icon ?? "🎁"}</span>
               <span className="min-w-0 flex-1 truncate text-sm">{rw.name}</span>
               <span className="text-sm font-black text-gold-ink">{Number(rw.cost).toFixed(1)}</span>
-              <button className="pressable px-2 py-2 text-xs text-gold-ink" onClick={() => update(rw)}>編輯</button>
-              <button className="pressable px-2 py-2 text-xs text-coral-ink" onClick={() => remove(rw)}>下架</button>
+              <button className="pressable px-2 py-2 text-xs text-gold-ink" onClick={() => setEditing(rw)}>編輯</button>
+              <button className="pressable px-2 py-2 text-xs text-coral-ink" onClick={() => setRemoving(rw)}>下架</button>
             </div>
           ))}
         </div>
       )}
+      {editing && (
+        <RewardEditModal
+          reward={editing}
+          onClose={() => setEditing(null)}
+          onSaved={() => {
+            setEditing(null);
+            onDone();
+          }}
+        />
+      )}
+      {removing && (
+        <ConfirmModal
+          title={`下架「${removing.name}」？`}
+          body="下架後兌換所將不再顯示此獎品；已兌換的紀錄不受影響。"
+          confirmText="確定下架"
+          busy={removeBusy}
+          onConfirm={doRemove}
+          onCancel={() => setRemoving(null)}
+        />
+      )}
     </>
+  );
+}
+
+/* ---------- 獎品編輯 modal ---------- */
+function RewardEditModal({
+  reward,
+  onClose,
+  onSaved,
+}: {
+  reward: Reward;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const toast = useToast();
+  const [form, setForm] = useState({
+    icon: reward.icon ?? "🎁",
+    name: reward.name,
+    cost: String(Number(reward.cost)),
+    marketPrice: reward.market_price == null ? "" : String(reward.market_price),
+  });
+  const [busy, setBusy] = useState(false);
+
+  async function save(e: React.FormEvent) {
+    e.preventDefault();
+    if (busy) return;
+    const cost = Number(form.cost);
+    if (!form.name.trim() || !Number.isFinite(cost) || cost <= 0) {
+      toast("請填名稱與正確點數");
+      return;
+    }
+    setBusy(true);
+    const r = await postJSON(
+      `/api/rewards/${reward.id}`,
+      {
+        icon: form.icon || "🎁",
+        name: form.name,
+        cost,
+        marketPrice: form.marketPrice === "" ? null : Number(form.marketPrice),
+      },
+      "PATCH"
+    );
+    setBusy(false);
+    if (r.ok) {
+      toast("已更新 ✅");
+      onSaved();
+    } else toast(r.error!);
+  }
+
+  return (
+    <SheetModal title="編輯獎品" onClose={onClose}>
+      <form onSubmit={save} className="space-y-3">
+        <div className="grid grid-cols-[4.5rem_1fr] gap-3">
+          <Field label="圖示">
+            <input
+              value={form.icon}
+              onChange={(e) => setForm({ ...form, icon: e.target.value })}
+              className="w-full rounded-xl border border-gold/30 bg-white px-2 py-2.5 text-center text-base outline-none focus:border-gold"
+            />
+          </Field>
+          <Field label="獎品名稱">
+            <input
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-base outline-none focus:border-gold"
+            />
+          </Field>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="兌換點數">
+            <input
+              value={form.cost}
+              onChange={(e) => setForm({ ...form, cost: e.target.value })}
+              type="number"
+              step="0.1"
+              min="0.1"
+              className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-base outline-none focus:border-gold"
+            />
+          </Field>
+          <Field label="市值 NT$（選填）">
+            <input
+              value={form.marketPrice}
+              onChange={(e) => setForm({ ...form, marketPrice: e.target.value })}
+              type="number"
+              min="0"
+              className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2.5 text-base outline-none focus:border-gold"
+            />
+          </Field>
+        </div>
+        <button
+          type="submit"
+          className="pressable w-full rounded-xl bg-plum py-3 text-sm font-bold text-cream"
+          disabled={busy}
+        >
+          {busy ? "儲存中…" : "儲存變更"}
+        </button>
+      </form>
+    </SheetModal>
   );
 }
 

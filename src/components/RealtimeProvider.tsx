@@ -14,6 +14,22 @@ export function triggerRefetch() {
 
 export default function RealtimeProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [offline, setOffline] = useState(false);
+
+  useEffect(() => {
+    const goOffline = () => setOffline(true);
+    const goOnline = () => {
+      setOffline(false);
+      triggerRefetch();
+    };
+    setOffline(typeof navigator !== "undefined" && !navigator.onLine);
+    window.addEventListener("offline", goOffline);
+    window.addEventListener("online", goOnline);
+    return () => {
+      window.removeEventListener("offline", goOffline);
+      window.removeEventListener("online", goOnline);
+    };
+  }, []);
 
   const addToast = useCallback((msg: string) => {
     const id = Date.now() + Math.random();
@@ -62,6 +78,14 @@ export default function RealtimeProvider({ children }: { children: React.ReactNo
 
   return (
     <ToastCtx.Provider value={addToast}>
+      {offline && (
+        <div
+          className="fixed inset-x-0 top-0 z-[60] bg-plum py-1.5 text-center text-xs font-medium text-cream"
+          role="alert"
+        >
+          📡 目前離線中，資料可能不是最新，連上網路後會自動更新
+        </div>
+      )}
       {children}
       <div
         className="fixed bottom-24 left-1/2 z-50 flex w-[92%] max-w-md -translate-x-1/2 flex-col gap-2"

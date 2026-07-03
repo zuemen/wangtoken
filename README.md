@@ -2,6 +2,8 @@
 
 情侶點數平台：女友做好事加分、做壞事扣分，點數可以兌換獎品。1 分 = NT$100。
 
+支援 **PWA 安裝**（加入手機主畫面即可當 App 使用）、**雙端即時同步**、**離線提示**、**骨架屏載入**與完整的無障礙對比（WCAG AA）。
+
 ## 技術棧
 
 - Next.js 14（App Router + TypeScript + Tailwind CSS）
@@ -68,4 +70,6 @@ npm run dev
 - **每日上限**：server 端以台北時區當日計數檢查。
 - **Streak**：近 7 天每天都有「乖乖聽話一天」核准紀錄且本週未領過 → 自動 +1.0「連續7天乖乖聽話🔥」+ 慶祝動畫。
 - **照片**：client 壓縮 ≤1MB → 上傳私有 bucket → 讀取時 server 簽發 1 小時 signed URL。
-- **安全**：RLS 全開、anon 只有 select（供 Realtime）；寫入一律走 server 端 service role；閘門與管理者皆為 httpOnly HMAC 簽章 cookie（90 天 / 24 小時）。
+- **安全**：RLS 全開、anon 只有 select（供 Realtime）；寫入一律走 server 端 service role；閘門與管理者皆為 httpOnly HMAC 簽章 cookie（90 天 / 24 小時）；通行碼暴力嘗試限流（每 IP 15 分鐘 10 次）；全站 security headers（nosniff / DENY frame / referrer policy）；私人應用預設 `noindex` 不被搜尋引擎收錄。
+- **PWA**：`manifest.webmanifest` + 192/512/maskable 圖示 + apple-touch-icon；Android 可「加入主畫面」安裝、iOS Safari 分享 → 加入主畫面。
+- **體驗**：骨架屏載入、離線提示橫幅（恢復連線自動 refetch）、品牌化 error / 404 頁、`prefers-reduced-motion` 支援、toast `aria-live`。
