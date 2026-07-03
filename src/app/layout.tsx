@@ -4,7 +4,7 @@ import RealtimeProvider from "@/components/RealtimeProvider";
 import BottomNav from "@/components/BottomNav";
 
 export const metadata: Metadata = {
-  title: "愛的存摺",
+  title: "胖呆積點器",
   description: "我們兩個人的點數存摺",
 };
 

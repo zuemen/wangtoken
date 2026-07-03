@@ -1,4 +1,4 @@
--- 愛的存摺 初始化 migration
+-- 胖呆積點器 初始化 migration
 create extension if not exists pgcrypto;
 
 -- ========== 資料表 ==========

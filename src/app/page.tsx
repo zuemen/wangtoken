@@ -96,7 +96,7 @@ export default function OverviewPage() {
       {/* 餘額大卡 */}
       <div className="card relative overflow-hidden p-6">
         <div className="absolute right-4 top-4 text-3xl opacity-20">💞</div>
-        <div className="text-xs tracking-widest text-plum/50">LOVE PASSBOOK・目前餘額</div>
+        <div className="text-xs tracking-widest text-plum/50">PANGDAI POINTS・目前餘額</div>
         <div className="mt-1 flex items-baseline gap-2">
           <span className="text-5xl font-black tabular-nums">{balance.toFixed(1)}</span>
           <span className="text-lg font-bold text-plum/60">分</span>

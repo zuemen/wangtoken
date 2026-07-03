@@ -29,7 +29,7 @@ export default function GatePage() {
     <div className="flex min-h-[80vh] flex-col items-center justify-center">
       <div className="card w-full max-w-sm p-8 text-center">
         <div className="text-5xl">💞</div>
-        <h1 className="mt-3 text-2xl font-black tracking-widest">愛的存摺</h1>
+        <h1 className="mt-3 text-2xl font-black tracking-widest">胖呆積點器</h1>
         <p className="mt-1 text-sm text-plum/60">我們兩個人的小小銀行</p>
         <form onSubmit={submit} className="mt-6">
           <input

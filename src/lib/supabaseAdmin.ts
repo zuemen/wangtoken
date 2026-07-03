@@ -7,5 +7,10 @@ export function admin(): SupabaseClient {
   if (!url || !key) throw new Error("缺少 Supabase 環境變數");
   return createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
+    // Next.js 會把 route handler 內的 GET fetch 收進 Data Cache，
+    // 導致 select 永遠拿到舊資料；一律 no-store 繞過
+    global: {
+      fetch: (input, init) => fetch(input, { ...init, cache: "no-store" }),
+    },
   });
 }
